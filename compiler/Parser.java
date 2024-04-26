@@ -3,6 +3,8 @@ package compiler;
 import compiler.TokenIntf.Type;
 import compiler.ast.*;
 
+import java.util.ArrayList;
+
 public class Parser {
     private Lexer m_lexer;
     private SymbolTableIntf m_symbolTable;
@@ -180,7 +182,32 @@ public class Parser {
     }
 
     ASTStmtNode getBlockStmt() throws Exception {
-        return null;
+
+        Token nextToken = m_lexer.lookAhead();
+        if (nextToken.m_type == Type.LBRACE) {
+            m_lexer.advance();
+            /*
+            while schleife bis RBrace
+            1.sammeln alle ASTExprNode in einer Liste
+            2.stmt + semicolon advancen
+             */
+
+            ArrayList<ASTStmtNode> statementNode = new ArrayList<ASTStmtNode>();
+            while (m_lexer.lookAhead().m_type != Type.RBRACE) {
+                statementNode.add(getStmtList());
+                if (m_lexer.lookAhead().m_type == Type.SEMICOLON) {
+                    m_lexer.advance();
+                } else {
+                    //fehlerhandling
+                    throw new Exception();
+                }
+            }
+            m_lexer.advance();
+            return new ASTBlockStmtNode(statementNode);
+        }else{
+            throw new Exception();
+        }
+
     }
 
 }
