@@ -4,6 +4,8 @@ import compiler.TokenIntf.Type;
 import compiler.ast.*;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 public class Parser {
     private Lexer m_lexer;
@@ -182,32 +184,21 @@ public class Parser {
     }
 
     ASTStmtNode getBlockStmt() throws Exception {
+        List<ASTStmtNode> stmtList = new LinkedList<>();
 
-        Token nextToken = m_lexer.lookAhead();
-        if (nextToken.m_type == Type.LBRACE) {
+        if (m_lexer.lookAhead().m_type == Type.LBRACE) {
             m_lexer.advance();
-            /*
-            while schleife bis RBrace
-            1.sammeln alle ASTExprNode in einer Liste
-            2.stmt + semicolon advancen
-             */
-
-            ArrayList<ASTStmtNode> statementNode = new ArrayList<ASTStmtNode>();
-            while (m_lexer.lookAhead().m_type != Type.RBRACE) {
-                statementNode.add(getStmtList());
-                if (m_lexer.lookAhead().m_type == Type.SEMICOLON) {
-                    m_lexer.advance();
-                } else {
-                    //fehlerhandling
-                    throw new Exception();
-                }
+            Token nextToken = m_lexer.lookAhead();
+            while (nextToken.m_type != Type.RBRACE && nextToken.m_type != Type.EOF) {
+                m_lexer.advance();
+                ASTStmtNode stmt = getStmt();
+                m_lexer.expect(Type.SEMICOLON);
+                stmtList.add(stmt);
+                nextToken = m_lexer.lookAhead();
             }
-            m_lexer.advance();
-            return new ASTBlockStmtNode(statementNode);
-        }else{
-            throw new Exception();
+            m_lexer.expect(Type.RBRACE);
         }
-
+        return new ASTBlockStmtNode(stmtList);
     }
 
 }

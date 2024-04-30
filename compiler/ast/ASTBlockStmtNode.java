@@ -13,7 +13,7 @@ public class ASTBlockStmtNode extends ASTStmtNode{
 
     @Override
     public void execute() {
-        listeMitStatements.forEach(node-> node.execute());
+        listeMitStatements.forEach(ASTStmtNode::execute);
     }
 
     @Override
@@ -26,10 +26,6 @@ public class ASTBlockStmtNode extends ASTStmtNode{
         outStream.write("\n");
         for (ASTStmtNode node : listeMitStatements){
             node.print(outStream, indent+" ");
-            outStream.write(indent + " ");
-            outStream.write("\n");
-            outStream.write("SEMICOLON");
-            outStream.write("\n");
         }
         outStream.write(indent);
         outStream.write("RBrace ");
