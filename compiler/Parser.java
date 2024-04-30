@@ -33,12 +33,11 @@ public class Parser {
         // parentheseExpr : NUMBER
         if (m_lexer.accept(TokenIntf.Type.INTEGER)) { // consume NUMBER
             return new ASTIntegerLiteralNode(token.m_value);
-        }
-        else {
+        } else {
             // parentheseExpr : LParen sumExpr RParen
-            m_lexer.expect(TokenIntf.Type.LPAREN); //consume Lparen
-            ASTExprNode result = new ASTParantheseNode(getQuestionMarkExpr()); //sumExpr
-            m_lexer.expect(TokenIntf.Type.RPAREN); //consume Rparen
+            m_lexer.expect(TokenIntf.Type.LPAREN); // consume Lparen
+            ASTExprNode result = new ASTParantheseNode(getQuestionMarkExpr()); // sumExpr
+            m_lexer.expect(TokenIntf.Type.RPAREN); // consume Rparen
             return result;
         }
     }
@@ -78,7 +77,7 @@ public class Parser {
     ASTExprNode getMulDivExpr() throws Exception {
         ASTExprNode result = getUnaryExpr(); // lhsOperand
         Token nextToken = m_lexer.lookAhead();
-        while (nextToken.m_type == TokenIntf.Type.MUL || nextToken.m_type == TokenIntf.Type.DIV ){
+        while (nextToken.m_type == TokenIntf.Type.MUL || nextToken.m_type == TokenIntf.Type.DIV) {
             m_lexer.advance(); // consume DIV | MUL
             ASTExprNode rhsOperand = getUnaryExpr();
             result = new ASTMulDivExprNode(result, nextToken, rhsOperand);
@@ -171,8 +170,19 @@ public class Parser {
     }
 
     ASTStmtNode getPrintStmt() throws Exception {
+        Token nextToken = m_lexer.lookAhead();
+        if (nextToken.m_type == TokenIntf.Type.PRINT) {
+            m_lexer.advance();
+            ASTExprNode expression = getVariableExpr();
+            nextToken = m_lexer.lookAhead();
+            if (nextToken.m_type == TokenIntf.Type.SEMICOLON) {
+                m_lexer.advance();
+                return new ASTPrintNode(expression);
+            } else{
+                throw new Exception("Missing semicolon after print statement.");
+            }
+        }
         return null;
-
     }
 
     ASTStmtNode getStmt() throws Exception {
